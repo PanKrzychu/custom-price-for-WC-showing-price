@@ -114,7 +114,7 @@ class Cart implements \CPWFreeVendor\WPDesk\PluginBuilder\Plugin\Hookable
         $posted_period = \CPWFreeVendor\WPDesk\Library\CustomPrice\Helper::get_posted_period($product, $suffix);
         if (\CPWFreeVendor\WPDesk\Library\CustomPrice\Helper::is_subscription($cpw_id) && \CPWFreeVendor\WPDesk\Library\CustomPrice\Helper::is_billing_period_variable($cpw_id) && $posted_period && \array_key_exists($posted_period, \CPWFreeVendor\WPDesk\Library\CustomPrice\Helper::get_subscription_period_strings())) {
             $cart_item_data['cpw_period'] = $posted_period;
-        }
+        } 
         return $cart_item_data;
     }
     /**
@@ -173,7 +173,19 @@ class Cart implements \CPWFreeVendor\WPDesk\PluginBuilder\Plugin\Hookable
                     $product->update_meta_data('_subscription_period_interval', 1);
                 }
             }
+
         }
+        // CHANGES CZACHOR
+        if( !end($cart_item['flexible_product_fields'])['is_added'] ) {
+            $custom_price_product_field = array(
+                'name' => $cart_item['data']->get_meta('_price_label', \true),
+                'value' => str_replace('.',',',\CPWFreeVendor\WPDesk\Library\CustomPrice\Helper::get_posted_price($product) . " " . get_woocommerce_currency_symbol()),
+                'is_added' => 1
+                
+            );
+            array_push($cart_item['flexible_product_fields'], $custom_price_product_field);
+        }
+        // CHANGES CZACHOR ENDS
         return $cart_item;
     }
     /**
